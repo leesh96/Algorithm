@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -45,11 +47,11 @@ class Edge {
     public int weight;
     public boolean isOpen;
 
-    public Edge(Vertex start, Vertex target, int weight, boolean isOpen) {
+    public Edge(Vertex start, Vertex target, int weight) {
         this.start = start;
         this.target = target;
         this.weight = weight;
-        this.isOpen = isOpen;
+        this.isOpen = false;
     }
 
     public Vertex getStart() {
@@ -89,23 +91,23 @@ public class GraphFrame extends JFrame {
     final int MAX_VERTEX = 10;
 
     public DrawPanel inputPanel, primPanel, kruskalPanel;
-    public ButtonPanel buttonPanel;
+    public JPanel buttonPanel;
     public int vertexCount = 1;
 
     public JLabel comboLabel1, comboLabel2, textLabel3;
     public JComboBox startVertex, endVertex;
     public JTextField inputWeight;
-    public JButton btnEdge, btnMidResult, btnFinalResult;
+    public JButton btnMakeEdge, btnMidResult, btnFinalResult;
 
     public ArrayList<Vertex> allVertex;
     public ArrayList<Edge> allEdge;
 
     GraphFrame(String title){
         super(title);
-        inputPanel = new DrawPanel();
-        primPanel = new DrawPanel();
-        kruskalPanel = new DrawPanel();
+        inputPanel = new DrawPanel("INPUT", "#FFFFFF");
         buttonPanel = new ButtonPanel();
+        primPanel = new DrawPanel("PRIM", "#81F7D8");
+        kruskalPanel = new DrawPanel("KRUSKAL", "#F6CEF5");
 
         comboLabel1 = new JLabel("VERTEX 1");
         comboLabel2 = new JLabel("VERTEX 2");
@@ -113,32 +115,18 @@ public class GraphFrame extends JFrame {
         startVertex = new JComboBox();
         endVertex = new JComboBox();
         inputWeight = new JTextField();
-        btnEdge = new JButton("INPUT EDGE");
+        btnMakeEdge = new JButton("INPUT EDGE");
         btnMidResult = new JButton("중간 결과");
         btnFinalResult = new JButton("최종 결과");
 
-        allVertex = new ArrayList<Vertex>();
-        allEdge = new ArrayList<Edge>();
-
-        inputPanel.setBorder(new TitledBorder(new LineBorder(Color.RED, 1), "INPUT"));
-        inputPanel.setBackground(Color.WHITE);
-        inputPanel.setOpaque(true);
-        buttonPanel.setBorder(new TitledBorder(new LineBorder(Color.RED, 1)));
-        buttonPanel.setBackground(Color.LIGHT_GRAY);
-        buttonPanel.setOpaque(true);
-        primPanel.setBorder(new TitledBorder(new LineBorder(Color.RED, 1), "PRIM"));
-        primPanel.setBackground(new Color(155, 229, 200));
-        primPanel.setOpaque(true);
-        kruskalPanel.setBorder(new TitledBorder(new LineBorder(Color.RED, 1), "KRUSKAL"));
-        kruskalPanel.setBackground(new Color(236, 206, 245));
-        kruskalPanel.setOpaque(true);
+        allVertex = new ArrayList<>();
+        allEdge = new ArrayList<>();
 
         inputPanel.setBounds(20, 50, 500, 500);
         buttonPanel.setBounds(540, 50, 200, 500);
         primPanel.setBounds(760, 50, 500, 500);
         kruskalPanel.setBounds(1280, 50, 500, 500);
 
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 40));
         comboLabel1.setPreferredSize(new Dimension(60, 20));
         comboLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         startVertex.setPreferredSize(new Dimension(80, 20));
@@ -148,7 +136,7 @@ public class GraphFrame extends JFrame {
         textLabel3.setPreferredSize(new Dimension(60, 20));
         textLabel3.setHorizontalAlignment(SwingConstants.CENTER);
         inputWeight.setPreferredSize(new Dimension(80, 20));
-        btnEdge.setPreferredSize(new Dimension(120, 40));
+        btnMakeEdge.setPreferredSize(new Dimension(120, 40));
         btnMidResult.setPreferredSize(new Dimension(120, 40));
         btnFinalResult.setPreferredSize(new Dimension(120, 40));
 
@@ -162,16 +150,36 @@ public class GraphFrame extends JFrame {
                 int y_start = clickedY - 15;
 
                 if ((5 >= x_start | x_start >= 465) | (5 >= y_start | y_start >= 465)) {
-                    JOptionPane.showMessageDialog(null, "입력 패널 범위 밖입니다.!", "노드 생성 불가", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "정점을 그릴 수 있는 범위가 아닙니다!", "정점 생성 불가", JOptionPane.ERROR_MESSAGE);
                 } else if (vertexCount > MAX_VERTEX) {
-                    JOptionPane.showMessageDialog(null, "노드의 개수는 최대 10개입니다.!", "노드 생성 불가", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "정점의 개수는 최대 10개입니다!", "정점 생성 불가", JOptionPane.ERROR_MESSAGE);
                 } else {
                     Vertex vertex = new Vertex(vertexCount, clickedX, clickedY);
                     allVertex.add(vertex);
                     startVertex.addItem(vertexCount);
                     endVertex.addItem(vertexCount);
-                    inputPanel.drawVertex(x_start, y_start);
+                    inputPanel.drawVertex(vertex);
                     vertexCount += 1;
+                }
+            }
+        });
+
+        btnMakeEdge.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int startVertexIndex = (int) startVertex.getSelectedItem() - 1;
+                int endVertexIndex = (int) endVertex.getSelectedItem() - 1;
+                Vertex start = allVertex.get(startVertexIndex);
+                Vertex end = allVertex.get(endVertexIndex);
+                int weight = Integer.parseInt(inputWeight.getText());
+
+                if (startVertexIndex == endVertexIndex) {
+                    JOptionPane.showMessageDialog(null, "자기 자신 연결 불가!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
+                } else if (inputWeight.getText() == null){
+                    JOptionPane.showMessageDialog(null, "가중치를 입력하세요!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Edge edge = new Edge(start, end, weight);
+                    inputPanel.drawEdge(edge);
                 }
             }
         });
@@ -182,7 +190,7 @@ public class GraphFrame extends JFrame {
         buttonPanel.add(endVertex);
         buttonPanel.add(textLabel3);
         buttonPanel.add(inputWeight);
-        buttonPanel.add(btnEdge);
+        buttonPanel.add(btnMakeEdge);
         buttonPanel.add(btnMidResult);
         buttonPanel.add(btnFinalResult);
 
@@ -196,24 +204,115 @@ public class GraphFrame extends JFrame {
     }
 
     class DrawPanel extends JPanel{
-        DrawPanel() {
+        DrawPanel(String title, String color) {
             super();
-            this.setBorder(new LineBorder(Color.RED, 2));
+            this.setBorder(new TitledBorder(new LineBorder(Color.RED, 1), title));
+            this.setBackground(Color.decode(color));
+            this.setOpaque(true);
+            this.setOpaque(true);
         }
 
-        public void drawVertex(int xPoint, int yPoint) {
+        public void drawVertex(Vertex vertex) {
+            int xPoint = vertex.getxPoint() - 15;
+            int yPoint = vertex.getyPoint() - 15;
+
             Graphics graphics = getGraphics();
             graphics.setColor(Color.decode("#F7BE81"));
             graphics.fillOval(xPoint, yPoint, 30, 30);
             graphics.setColor(Color.BLACK);
             graphics.drawString(Integer.toString(vertexCount), xPoint + 12, yPoint + 18);
         }
+
+        public void drawEdge(Edge edge) {
+            Vertex start = edge.getStart();
+            Vertex end = edge.getTarget();
+            int startX = start.getxPoint();
+            int startY = start.getyPoint();
+            int endX = end.getxPoint();
+            int endY = end.getyPoint();
+            int deltaX = Math.abs(endX - startX);
+            int deltaY = Math.abs(endY - startY);
+            double length = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            int xlen = (int) ((15 * deltaX) / length);
+            int ylen = (int) ((15 * deltaY) / length);
+            boolean isCollision = false;
+
+            for (int i = 0; i < allVertex.size(); i++) {
+                Vertex temp = allVertex.get(i);
+                if (temp.getVertexNum() == start.getVertexNum() | temp.getVertexNum() == end.getVertexNum()) {
+                    continue;
+                } else {
+                    isCollision = checkCollision(start, end, temp);
+                }
+            }
+            if (isCollision) {
+                JOptionPane.showMessageDialog(null, "겹치는 정점 존재!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
+            } else {
+                allEdge.add(edge);
+                Graphics graphics = getGraphics();
+                graphics.setColor(Color.BLACK);
+                if (endX > startX) {
+                    if (endY < startY) {
+                        graphics.drawLine(startX + xlen, startY - ylen, endX - xlen, endY + ylen);
+                    } else if (endY == startY) {
+                        graphics.drawLine(startX + 15, startY, endX - 15, endY);
+                    } else {
+                        graphics.drawLine(startX + xlen, startY + ylen, endX - xlen, endY - ylen);
+                    }
+                } else if (endX == startX) {
+                    if (endY < startY) {
+                        graphics.drawLine(startX, startY - 15, endX, endY + 15);
+                    } else {
+                        graphics.drawLine(startX, startY + 15, endX, endY - 15);
+                    }
+                } else {
+                    if (endY < startY) {
+                        graphics.drawLine(startX - xlen, startY - ylen, endX + xlen, endY + ylen);
+                    } else if (endY == startY) {
+                        graphics.drawLine(startX - 15, startY, endX + 15, endY);
+                    } else {
+                        graphics.drawLine(startX - xlen, startY + ylen, endX + xlen, endY - ylen);
+                    }
+                }
+            }
+        }
+
+        public boolean checkCollision(Vertex start, Vertex end, Vertex checkVertex) {
+            int startX = start.getxPoint();
+            int startY = start.getyPoint();
+            int endX = end.getxPoint();
+            int endY = end.getyPoint();
+
+            double a, b, c;         //ax + by + c = 0
+            if (startX == endX) {
+                a = 1;
+                b = 0;
+                c = -startX;
+            } else {
+                a = (endY - startY) / (endX - startX);
+                b = -1;
+                c = -startX * a + startY;
+            }
+            double distance = (Math.abs(a * checkVertex.getxPoint() + b * checkVertex.getyPoint() + c)) / (Math.sqrt(a * a + b * b));
+            if (distance <= 15) {
+                if (((checkVertex.getxPoint() < startX & checkVertex.getxPoint() < endX) | (checkVertex.getxPoint() > startX & checkVertex.getyPoint() > endX)) | ((checkVertex.getyPoint() < startY & checkVertex.getyPoint() < endY) & (checkVertex.getyPoint() > startY & checkVertex.getyPoint() > endY))) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        }
     }
 
     class ButtonPanel extends JPanel {
         ButtonPanel() {
             super();
-            this.setBorder(new LineBorder(Color.RED, 2));
+            this.setBorder(new LineBorder(Color.RED, 1));
+            this.setBackground(Color.LIGHT_GRAY);
+            this.setOpaque(true);
+            this.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 40));
         }
     }
 
@@ -226,4 +325,4 @@ public class GraphFrame extends JFrame {
     }
 }
 
-// TODO: 2020-11-29 정점과 간선은 겹치지 않게 그리기, 프림 알고리즘 구현, 크루스칼 알고리즘 구현
+// TODO: 2020-11-29 가중치 그리기, 프림 알고리즘 구현, 크루스칼 알고리즘 구현
