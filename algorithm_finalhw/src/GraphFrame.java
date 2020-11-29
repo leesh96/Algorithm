@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 class Vertex {
     public int vertexNum, xPoint, yPoint;
@@ -43,15 +45,15 @@ class Vertex {
 }
 
 class Edge {
-    public Vertex start, target;
+    public Vertex start, end;
     public int weight;
-    public boolean isOpen;
+    public boolean isVisited;
 
-    public Edge(Vertex start, Vertex target, int weight) {
+    public Edge(Vertex start, Vertex end, int weight) {
         this.start = start;
-        this.target = target;
+        this.end = end;
         this.weight = weight;
-        this.isOpen = false;
+        this.isVisited = false;
     }
 
     public Vertex getStart() {
@@ -62,12 +64,12 @@ class Edge {
         this.start = start;
     }
 
-    public Vertex getTarget() {
-        return target;
+    public Vertex getEnd() {
+        return end;
     }
 
-    public void setTarget(Vertex target) {
-        this.target = target;
+    public void setEnd(Vertex end) {
+        this.end = end;
     }
 
     public int getWeight() {
@@ -78,12 +80,12 @@ class Edge {
         this.weight = weight;
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public boolean isVisited() {
+        return isVisited;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
+    public void setVisited(boolean visited) {
+        isVisited = visited;
     }
 }
 
@@ -155,11 +157,15 @@ public class GraphFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "정점의 개수는 최대 10개입니다!", "정점 생성 불가", JOptionPane.ERROR_MESSAGE);
                 } else {
                     Vertex vertex = new Vertex(vertexCount, clickedX, clickedY);
-                    allVertex.add(vertex);
-                    startVertex.addItem(vertexCount);
-                    endVertex.addItem(vertexCount);
-                    inputPanel.drawVertex(vertex);
-                    vertexCount += 1;
+                    if (checkVertexOverlap(vertex)) {
+                        JOptionPane.showMessageDialog(null, "정점이 겹칩니다!", "정점 생성 불가", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        allVertex.add(vertex);
+                        startVertex.addItem(vertexCount);
+                        endVertex.addItem(vertexCount);
+                        inputPanel.drawVertex(vertex);
+                        vertexCount += 1;
+                    }
                 }
             }
         });
@@ -167,20 +173,39 @@ public class GraphFrame extends JFrame {
         btnMakeEdge.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int startVertexIndex = (int) startVertex.getSelectedItem() - 1;
-                int endVertexIndex = (int) endVertex.getSelectedItem() - 1;
+                int startVertexIndex = (int)startVertex.getSelectedItem() - 1;
+                int endVertexIndex = (int)endVertex.getSelectedItem() - 1;
                 Vertex start = allVertex.get(startVertexIndex);
                 Vertex end = allVertex.get(endVertexIndex);
-                int weight = Integer.parseInt(inputWeight.getText());
 
                 if (startVertexIndex == endVertexIndex) {
                     JOptionPane.showMessageDialog(null, "자기 자신 연결 불가!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
-                } else if (inputWeight.getText() == null){
+                } else if (inputWeight.getText().equals("")){
                     JOptionPane.showMessageDialog(null, "가중치를 입력하세요!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    Edge edge = new Edge(start, end, weight);
-                    inputPanel.drawEdge(edge);
+                    int weight = Integer.parseInt(inputWeight.getText());
+                    inputPanel.makeEdge(start, end, weight);
+                    /*if (checkEdgeOverlap(edge)) {
+                        JOptionPane.showMessageDialog(null, "이미 존재하는 엣지입니다.", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        inputPanel.drawEdge(edge);
+                        inputPanel.makeEdge(start, end, weight);
+                    }*/
                 }
+            }
+        });
+
+        btnMidResult.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        btnFinalResult.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
 
@@ -203,6 +228,39 @@ public class GraphFrame extends JFrame {
         setFocusable(true);
     }
 
+    public boolean checkVertexOverlap(Vertex check) {
+        boolean isOverlap = false;
+        for (int i = 0; i < allVertex.size(); i++) {
+            Vertex temp = allVertex.get(i);
+            double deltaX = Math.abs(temp.getxPoint() - check.getxPoint());
+            double deltaY = Math.abs(temp.getyPoint() - check.getyPoint());
+            double length = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            if (check.getVertexNum() == temp.getVertexNum()) {
+                continue;
+            } else {
+                if (length < 30) {
+                    isOverlap = true;
+                    break;
+                }
+            }
+        }
+        return isOverlap;
+    }
+
+    public boolean checkEdgeOverlap(Edge check) {
+        boolean isOverlap = false;
+        int startVertexNum = check.getStart().getVertexNum();
+        int targetVertexNum = check.getEnd().getVertexNum();
+        for (int i = 0; i < allEdge.size(); i++) {
+            Edge temp = allEdge.get(i);
+            if ((startVertexNum == temp.getStart().getVertexNum() & targetVertexNum == temp.getEnd().getVertexNum()) || targetVertexNum == temp.getStart().getVertexNum() & startVertexNum == temp.getEnd().getVertexNum()) {
+                isOverlap = true;
+                break;
+            }
+        }
+        return isOverlap;
+    }
+
     class DrawPanel extends JPanel{
         DrawPanel(String title, String color) {
             super();
@@ -223,57 +281,22 @@ public class GraphFrame extends JFrame {
             graphics.drawString(Integer.toString(vertexCount), xPoint + 12, yPoint + 18);
         }
 
-        public void drawEdge(Edge edge) {
-            Vertex start = edge.getStart();
-            Vertex end = edge.getTarget();
-            int startX = start.getxPoint();
-            int startY = start.getyPoint();
-            int endX = end.getxPoint();
-            int endY = end.getyPoint();
-            int deltaX = Math.abs(endX - startX);
-            int deltaY = Math.abs(endY - startY);
-            double length = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-            int xlen = (int) ((15 * deltaX) / length);
-            int ylen = (int) ((15 * deltaY) / length);
+        public void makeEdge(Vertex start, Vertex end, int weight) {
+            int startVertexNum = start.getVertexNum();
+            int endVertexNum = end.getVertexNum();
             boolean isCollision = false;
 
-            for (int i = 0; i < allVertex.size(); i++) {
-                Vertex temp = allVertex.get(i);
-                if (temp.getVertexNum() == start.getVertexNum() | temp.getVertexNum() == end.getVertexNum()) {
-                    continue;
-                } else {
+            for (Vertex temp : allVertex) {
+                if (!(temp.getVertexNum() == startVertexNum | temp.getVertexNum() == endVertexNum)) {
                     isCollision = checkCollision(start, end, temp);
+                    break;
                 }
             }
-            if (isCollision) {
+
+            if(isCollision) {
                 JOptionPane.showMessageDialog(null, "겹치는 정점 존재!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
             } else {
-                allEdge.add(edge);
-                Graphics graphics = getGraphics();
-                graphics.setColor(Color.BLACK);
-                if (endX > startX) {
-                    if (endY < startY) {
-                        graphics.drawLine(startX + xlen, startY - ylen, endX - xlen, endY + ylen);
-                    } else if (endY == startY) {
-                        graphics.drawLine(startX + 15, startY, endX - 15, endY);
-                    } else {
-                        graphics.drawLine(startX + xlen, startY + ylen, endX - xlen, endY - ylen);
-                    }
-                } else if (endX == startX) {
-                    if (endY < startY) {
-                        graphics.drawLine(startX, startY - 15, endX, endY + 15);
-                    } else {
-                        graphics.drawLine(startX, startY + 15, endX, endY - 15);
-                    }
-                } else {
-                    if (endY < startY) {
-                        graphics.drawLine(startX - xlen, startY - ylen, endX + xlen, endY + ylen);
-                    } else if (endY == startY) {
-                        graphics.drawLine(startX - 15, startY, endX + 15, endY);
-                    } else {
-                        graphics.drawLine(startX - xlen, startY + ylen, endX + xlen, endY - ylen);
-                    }
-                }
+                drawEdge(start, end, weight);
             }
         }
 
@@ -289,21 +312,74 @@ public class GraphFrame extends JFrame {
                 b = 0;
                 c = -startX;
             } else {
-                a = (endY - startY) / (endX - startX);
+                a = (double)(endY - startY) / (double)(endX - startX);
                 b = -1;
                 c = -startX * a + startY;
             }
             double distance = (Math.abs(a * checkVertex.getxPoint() + b * checkVertex.getyPoint() + c)) / (Math.sqrt(a * a + b * b));
             if (distance <= 15) {
-                if (((checkVertex.getxPoint() < startX & checkVertex.getxPoint() < endX) | (checkVertex.getxPoint() > startX & checkVertex.getyPoint() > endX)) | ((checkVertex.getyPoint() < startY & checkVertex.getyPoint() < endY) & (checkVertex.getyPoint() > startY & checkVertex.getyPoint() > endY))) {
+                if (((checkVertex.getxPoint() - 30 < startX & checkVertex.getxPoint() - 30 < endX) | (checkVertex.getxPoint() + 30 > startX & checkVertex.getxPoint() + 30 > endX)) & ((checkVertex.getyPoint() - 30 < startY & checkVertex.getyPoint() - 30 < endY) | (checkVertex.getyPoint() + 30 > startY & checkVertex.getyPoint() + 30 > endY))) {
                     return false;
                 } else {
                     return true;
                 }
+            } else return false;
+        }
+
+        public void drawEdge(Vertex start, Vertex end, int weight) {
+            int startX = start.getxPoint();
+            int startY = start.getyPoint();
+            int endX = end.getxPoint();
+            int endY = end.getyPoint();
+            int deltaX = Math.abs(endX - startX);
+            int deltaY = Math.abs(endY - startY);
+            double length = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            int xlen = (int) ((15 * deltaX) / length);
+            int ylen = (int) ((15 * deltaY) / length);
+
+            allEdge.add(new Edge(start, end, weight));
+            Graphics graphics = getGraphics();
+            graphics.setColor(Color.BLACK);
+            if (endX > startX) {
+                if (endY < startY) {
+                    graphics.drawLine(startX + xlen, startY - ylen, endX - xlen, endY + ylen);
+                    drawWeight(weight, startX + (int)(0.4 * deltaX) - 5, startY - (int)(0.4 * deltaY));
+                } else if (endY == startY) {
+                    graphics.drawLine(startX + 15, startY, endX - 15, endY);
+                    drawWeight(weight, startX + (int)(0.4 * deltaX), startY + 10);
+                } else {
+                    graphics.drawLine(startX + xlen, startY + ylen, endX - xlen, endY - ylen);
+                    drawWeight(weight, startX + (int)(0.4 * deltaX) + 5, startY + (int)(0.4 * deltaY));
+                }
+            } else if (endX == startX) {
+                if (endY < startY) {
+                    graphics.drawLine(startX, startY - 15, endX, endY + 15);
+                    drawWeight(weight, startX + 5, startY - (int)(0.4 * deltaY));
+                } else {
+                    graphics.drawLine(startX, startY + 15, endX, endY - 15);
+                    drawWeight(weight, startX + 5, startY + (int)(0.4 * deltaY));
+                }
             } else {
-                return false;
+                if (endY < startY) {
+                    graphics.drawLine(startX - xlen, startY - ylen, endX + xlen, endY + ylen);
+                    drawWeight(weight, startX - (int)(0.4 * deltaX) + 5, startY - (int)(0.4 * deltaY));
+                } else if (endY == startY) {
+                    graphics.drawLine(startX - 15, startY, endX + 15, endY);
+                    drawWeight(weight, startX - (int)(0.4 * deltaX), startY - 5);
+                } else {
+                    graphics.drawLine(startX - xlen, startY + ylen, endX + xlen, endY - ylen);
+                    drawWeight(weight, startX - (int)(0.4 * deltaX) + 5, startY + (int)(0.4 * deltaY));
+                }
             }
         }
+
+        public void drawWeight(int weight, int x, int y) {
+            String Weight = Integer.toString(weight);
+            Graphics graphics = getGraphics();
+            graphics.setColor(Color.BLACK);
+            graphics.drawString(Weight, x, y);
+        }
+
     }
 
     class ButtonPanel extends JPanel {
@@ -323,6 +399,7 @@ public class GraphFrame extends JFrame {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
 }
 
-// TODO: 2020-11-29 가중치 그리기, 프림 알고리즘 구현, 크루스칼 알고리즘 구현
+// TODO: 2020-11-29 프림 알고리즘 구현, 크루스칼 알고리즘 구현
