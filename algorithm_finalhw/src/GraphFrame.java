@@ -9,168 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-class Vertex {
-    public int vertexNum, xPoint, yPoint;
-    public int distance;
-
-    Vertex(int vertexNum, int xPoint, int yPoint) {
-        this.vertexNum = vertexNum;
-        this.xPoint = xPoint;
-        this.yPoint = yPoint;
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    public int getVertexNum() {
-        return vertexNum;
-    }
-
-    public void setVertexNum(int vertexNum) {
-        this.vertexNum = vertexNum;
-    }
-
-    public int getxPoint() {
-        return xPoint;
-    }
-
-    public void setxPoint(int xPoint) {
-        this.xPoint = xPoint;
-    }
-
-    public int getyPoint() {
-        return yPoint;
-    }
-
-    public void setyPoint(int yPoint) {
-        this.yPoint = yPoint;
-    }
-}   // 정점 클래스
-
-class Edge implements Comparable<Edge> {
-    public Vertex start, end;
-    public int weight;
-
-    Edge(Vertex start, Vertex end, int weight) {
-        this.start = start;
-        this.end = end;
-        this.weight = weight;
-    }
-
-    public Vertex getStart() {
-        return start;
-    }
-
-    public void setStart(Vertex start) {
-        this.start = start;
-    }
-
-    public Vertex getEnd() {
-        return end;
-    }
-
-    public void setEnd(Vertex end) {
-        this.end = end;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    @Override
-    public int compareTo(Edge o) {
-        if(this.weight <= o.weight)
-            return -1;
-        else return 1;
-    }
-}   // 엣지 클래스
-
-class LinkedVertex {    // 인접 정점 리스트
-    public Vertex linked;
-    public int weight;
-
-    public LinkedVertex(Vertex linked, int weight) {
-        this.linked = linked;
-        this.weight = weight;
-    }
-
-    public Vertex getLinked() {
-        return linked;
-    }
-
-    public void setLinked(Vertex linked) {
-        this.linked = linked;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-}
-
-class LinkedEdge implements Comparable<LinkedEdge> {    // 인접 정점을 잇는 간선 자료구조 -> 우선순위 큐
-    public Vertex linkVertex;
-    public int weight;
-
-    public LinkedEdge(Vertex linkVertex, int weight) {
-        this.linkVertex = linkVertex;
-        this.weight = weight;
-    }
-
-    public Vertex getLinkVertex() {
-        return this.linkVertex;
-    }
-
-    public void setLinkVertex(Vertex linkVertex) {
-        this.linkVertex = linkVertex;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    @Override
-    public int compareTo(LinkedEdge o) {
-        return this.weight - o.weight;
-    }
-}
-
-class PrimMST {         // 그려낼 트리 자료구조
-    public List<Vertex> resVertex;
-    public List<Edge> resEdge;
-
-    public PrimMST() {
-        this.resVertex = new ArrayList<>();
-        this.resEdge = new ArrayList<>();
-    }
-}
-
-class KruskalMST {
-    public List<Vertex> resVertex;
-    public List<Edge> resEdge;
-
-    public KruskalMST() {
-        this.resVertex = new ArrayList<>();
-        this.resEdge = new ArrayList<>();
-    }
-}
-
 public class GraphFrame extends JFrame {
     final static int MAX_VERTEX = 10;
     final static String INPUTPANEL_COLOR = "#FFFFFF";
@@ -182,6 +20,7 @@ public class GraphFrame extends JFrame {
     public DrawPanel inputPanel, primPanel, kruskalPanel;
     public JPanel buttonPanel;
     public int vertexCount = 1;
+    public int[] parent;
 
     public JLabel comboLabel1, comboLabel2, textLabel3, textLabel4;
     public JComboBox startVertex, endVertex;
@@ -294,14 +133,13 @@ public class GraphFrame extends JFrame {
                 } else {
                     int startVertexNum = Integer.parseInt(inputStart.getText());
                     PrimMST PrimResult = primAlgo(allVertex.get(startVertexNum - 1), allVertex.size() / 2);
-                    /*primPanel.repaint();
-                    kruskalPanel.repaint();*/
                     for (Vertex vertex : PrimResult.resVertex) {
                         primPanel.drawVertex(vertex);
                     }
                     for (Edge edge : PrimResult.resEdge) {
                         primPanel.drawEdge(edge);
                     }
+                    //primPanel.repaint();
                     KruskalMST KruskalResult = kruskalAlgo(allVertex.size() / 2);
                     for (Vertex vertex : KruskalResult.resVertex) {
                         kruskalPanel.drawVertex(vertex);
@@ -309,6 +147,7 @@ public class GraphFrame extends JFrame {
                     for (Edge edge : KruskalResult.resEdge) {
                         kruskalPanel.drawEdge(edge);
                     }
+                    //kruskalPanel.repaint();
                     inputStart.setText("");
                 }
             }
@@ -322,23 +161,15 @@ public class GraphFrame extends JFrame {
                     JOptionPane.showMessageDialog(null, "시작 정점을 입력하세요!(for PRIM)", "결과 출력 불가", JOptionPane.ERROR_MESSAGE);
                 } else {
                     int startVertexNum = Integer.parseInt(inputStart.getText());
-                    PrimMST PrimResult = primAlgo(allVertex.get(startVertexNum - 1), allVertex.size());
-                    /*primPanel.repaint();
-                    kruskalPanel.repaint();*/
-                    for (Vertex vertex : PrimResult.resVertex) {
-                        primPanel.drawVertex(vertex);
-                    }
-                    for (Edge edge : PrimResult.resEdge) {
-                        primPanel.drawEdge(edge);
-                    }
-                    KruskalMST KruskalResult = kruskalAlgo(allVertex.size());
-                    for (Vertex vertex : KruskalResult.resVertex) {
-                        kruskalPanel.drawVertex(vertex);
-                    }
-                    for (Edge edge : KruskalResult.resEdge) {
-                        kruskalPanel.drawEdge(edge);
-                    }
+                    PrimMST primResult = primAlgo(allVertex.get(startVertexNum - 1), allVertex.size());
+                    KruskalMST kruskalResult = kruskalAlgo(allVertex.size());
+
+                    primPanel.drawPrim(primResult);
+                    kruskalPanel.drawKruskal(kruskalResult);
+
                     inputStart.setText("");
+                    //primPanel.repaint();
+                    //kruskalPanel.repaint();
                 }
             }
         });
@@ -406,43 +237,16 @@ public class GraphFrame extends JFrame {
         while (Q.size() != 0) {
             Vertex u = deleteMIN(Q, d);
             result.resVertex.add(u);
-            if (length == allVertex.size() / 2) {
-                if (Q.size() < length) break;
-            }
+            if (Q.size() <= allVertex.size() - length) break;
             ArrayList<LinkedVertex> L = new ArrayList<>();
             L.addAll(findLinkVertex(u));
             for (LinkedVertex v : L) {
-                if (Q.contains(v.getLinked()) && v.weight < d[v.getLinked().getVertexNum() - 1]) {
+                if (Q.contains(v.getLinked()) & v.weight < d[v.getLinked().getVertexNum() - 1]) {
                     d[v.getLinked().getVertexNum() - 1] = v.weight;
                 }
             }
             result.resEdge.add(findMinEdge(result, d));
         }
-        return result;
-    }
-
-    public Edge findMinEdge(PrimMST r, int[] d) {
-        int minDist = d[0];
-        int minIndex = 0;
-        for(int i = 1; i < d.length; i++) {
-            if (d[i] < minDist) {
-                minDist = d[i];
-                minIndex = i;
-            }
-        }
-        Vertex target = allVertex.get(minIndex);
-        int resultIndex = 0;
-        for (Edge temp : allEdge) {
-            if (temp.getWeight() == minDist) {
-                Vertex start = temp.getStart();
-                Vertex end = temp.getEnd();
-                if (!r.resEdge.contains(temp)) {
-                    if (start.equals(target) | end.equals(target))
-                        resultIndex = allEdge.indexOf(temp);
-                }
-            }
-        }
-        Edge result = allEdge.get(resultIndex);
         return result;
     }
 
@@ -474,11 +278,39 @@ public class GraphFrame extends JFrame {
         return L;
     }
 
-    public int[] parent;
+    public Edge findMinEdge(PrimMST r, /*ArrayList<Vertex> Q,*/ int[] d) {
+        int minDist = d[0];
+        int minIndex = 0;
+        for(int i = 1; i < d.length; i++) {
+            if (d[i] < minDist) {
+                minDist = d[i];
+                minIndex = i;
+            }
+        }
+        Vertex target = allVertex.get(minIndex);
+        int resultIndex = 0;
+        for (Edge temp : allEdge) {
+            if (temp.getWeight() == minDist) {
+                Vertex start = temp.getStart();
+                Vertex end = temp.getEnd();
+                if (!r.resEdge.contains(temp)) {
+                    /*if (start.equals(target)) {
+                        if ()
+                    } else if (end.equals(target)) {
+                        if ()
+                    }*/
+                    if (start.equals(target) | end.equals(target))
+                        resultIndex = allEdge.indexOf(temp);
+                }
+            }
+        }
+        Edge result = allEdge.get(resultIndex);
+        return result;
+    }
 
     public KruskalMST kruskalAlgo(int length) {
         KruskalMST result = new KruskalMST();
-        parent = new int[length];
+        parent = new int[allVertex.size()];
         for (int i = 0; i < parent.length; i++) {
             parent[i] = i;
         }
@@ -546,9 +378,11 @@ public class GraphFrame extends JFrame {
             boolean isCollision = false;
 
             for (Vertex temp : allVertex) {
-                if (!(temp.getVertexNum() == startVertexNum | temp.getVertexNum() == endVertexNum)) {
+                if (temp.getVertexNum() == startVertexNum | temp.getVertexNum() == endVertexNum) {
+                    continue;
+                } else {
                     isCollision = checkCollision(start, end, temp);
-                    break;
+                    if(isCollision) break;
                 }
             }
 
@@ -688,6 +522,23 @@ public class GraphFrame extends JFrame {
             graphics.drawString(Weight, x, y);
         }
 
+        public void drawPrim(PrimMST primMST) {
+            for (Vertex vertex : primMST.resVertex) {
+                primPanel.drawVertex(vertex);
+            }
+            for (Edge edge : primMST.resEdge) {
+                primPanel.drawEdge(edge);
+            }
+        }
+
+        public void drawKruskal(KruskalMST kruskalMST) {
+            for (Vertex vertex : kruskalMST.resVertex) {
+                kruskalPanel.drawVertex(vertex);
+            }
+            for (Edge edge : kruskalMST.resEdge) {
+                kruskalPanel.drawEdge(edge);
+            }
+        }
     }
 
     class ButtonPanel extends JPanel {
@@ -700,6 +551,166 @@ public class GraphFrame extends JFrame {
         }
     }
 
+    class Vertex {
+        public int vertexNum, xPoint, yPoint;
+        public int distance;
+
+        Vertex(int vertexNum, int xPoint, int yPoint) {
+            this.vertexNum = vertexNum;
+            this.xPoint = xPoint;
+            this.yPoint = yPoint;
+        }
+
+        public int getDistance() {
+            return distance;
+        }
+
+        public void setDistance(int distance) {
+            this.distance = distance;
+        }
+
+        public int getVertexNum() {
+            return vertexNum;
+        }
+
+        public void setVertexNum(int vertexNum) {
+            this.vertexNum = vertexNum;
+        }
+
+        public int getxPoint() {
+            return xPoint;
+        }
+
+        public void setxPoint(int xPoint) {
+            this.xPoint = xPoint;
+        }
+
+        public int getyPoint() {
+            return yPoint;
+        }
+
+        public void setyPoint(int yPoint) {
+            this.yPoint = yPoint;
+        }
+    }   // 정점 클래스
+
+    class Edge implements Comparable<Edge> {
+        public Vertex start, end;
+        public int weight;
+
+        Edge(Vertex start, Vertex end, int weight) {
+            this.start = start;
+            this.end = end;
+            this.weight = weight;
+        }
+
+        public Vertex getStart() {
+            return start;
+        }
+
+        public void setStart(Vertex start) {
+            this.start = start;
+        }
+
+        public Vertex getEnd() {
+            return end;
+        }
+
+        public void setEnd(Vertex end) {
+            this.end = end;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(Edge o) {
+            return this.weight - o.weight;
+        }
+    }   // 엣지 클래스
+
+    class LinkedVertex {    // 인접 정점 리스트
+        public Vertex linked;
+        public int weight;
+
+        LinkedVertex(Vertex linked, int weight) {
+            this.linked = linked;
+            this.weight = weight;
+        }
+
+        public Vertex getLinked() {
+            return linked;
+        }
+
+        public void setLinked(Vertex linked) {
+            this.linked = linked;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
+    }
+
+    class PrimMST {         // 그려낼 트리 자료구조
+        public List<Vertex> resVertex;
+        public List<Edge> resEdge;
+
+        PrimMST() {
+            this.resVertex = new ArrayList<>();
+            this.resEdge = new ArrayList<>();
+        }
+    }
+
+    class KruskalMST {
+        public List<Vertex> resVertex;
+        public List<Edge> resEdge;
+
+        KruskalMST() {
+            this.resVertex = new ArrayList<>();
+            this.resEdge = new ArrayList<>();
+        }
+    }
+
+    /*class LinkedEdge implements Comparable<LinkedEdge> {    // 인접 정점을 잇는 간선 자료구조 -> 우선순위 큐
+        public Vertex linkVertex;
+        public int weight;
+
+        LinkedEdge(Vertex linkVertex, int weight) {
+            this.linkVertex = linkVertex;
+            this.weight = weight;
+        }
+
+        public Vertex getLinkVertex() {
+            return this.linkVertex;
+        }
+
+        public void setLinkVertex(Vertex linkVertex) {
+            this.linkVertex = linkVertex;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+        public void setWeight(int weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public int compareTo(LinkedEdge o) {
+            return this.weight - o.weight;
+        }
+    }*/
+
     public static void main(String[] args) {
         JFrame frame = new GraphFrame("2016010887이수호");
         frame.setSize(1810, 630);
@@ -709,4 +720,4 @@ public class GraphFrame extends JFrame {
     }
 
 }
-// TODO: 2020-11-30 충돌 해법, 패널 다시 그리기, 가중치 출력 다듬기
+// TODO: 2020-12-01 여러 입력 해보기

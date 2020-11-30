@@ -3,77 +3,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-class BtnPanel extends JPanel { // 입출력 UI
-    final String BTNPANEL_BG_COLOR = "#9999FF";
-
-    JButton btnInsert, btnDelete;
-    JTextField number;
-
-    BtnPanel() {
-        number = new JTextField(5); // 숫자 입력 칸
-        btnInsert = new JButton("삽입"); // 삽입 버튼
-        btnDelete = new JButton("삭제"); // 삭제 버튼
-
-        btnInsert.setSize(60, 40);
-        btnDelete.setSize(60, 40); // 버튼 크기 조절
-
-        setOpaque(true);
-        setBackground(Color.decode(BTNPANEL_BG_COLOR));
-
-        add(number);
-        add(btnInsert);
-        add(btnDelete); // 패널에 요소 삽입
-    }
-}
-
-class TreePanel extends JPanel { // 트리가 그려지는 패널
-    final String TREEPANEL_BG_COLOR = "#FFFFFF";
-    final String NODE_COLOR = "#FFCC66";
-    final String COLOR_BLACK = "#000000";
-
-    TreePanel() {
-        setOpaque(true);
-        setBackground(Color.decode(TREEPANEL_BG_COLOR));
-    }
-
-    public void drawTree(Node n, Node root) { // 트리 그리는 함수
-        Graphics dTree = getGraphics();
-
-        if(n == root) {
-            super.paintComponent(dTree);
-        }
-
-        if(n != null) {
-            drawTree(n.getLeft(), n);
-            if (n.getLeft() != null && n.getRight() != null) {
-                drawLine(n, n.getLeft());
-                drawLine(n, n.getRight());
-            } else if (n.getLeft() == null && n.getRight() != null) {
-                drawLine(n, n.getRight());
-            } else if (n.getRight() == null && n.getLeft() != null) {
-                drawLine(n, n.getLeft());
-            }
-            drawNode(n);
-            drawTree(n.getRight(), n);
-        }
-    }
-
-    public void drawNode(Node n) { // 노드 그리는 함수
-        Graphics dNode = getGraphics();
-
-        dNode.setColor(Color.decode(NODE_COLOR));
-        dNode.fillOval(n.getX_coor(), n.getY_coor(), 40, 40);
-        dNode.setColor(Color.decode(COLOR_BLACK));
-        dNode.drawString(Integer.toString(n.getValue()), n.getX_coor() + 13, n.getY_coor() + 23);
-    }
-
-    public void drawLine(Node p, Node n) { // 간선 그리는 함수
-        Graphics line = getGraphics();
-        line.setColor(Color.decode(COLOR_BLACK));
-        line.drawLine(p.getX_coor() + 20, p.getY_coor() + 40, n.getX_coor() + 20, n.getY_coor());
-    }
-}
-
 class BST_frame extends JFrame {
     final int MAX_NODE_COUNT = 20; // 최대 노드 갯수 상수
     final int MAX_DEPTH = 4; // 최대 깊이 상수
@@ -137,20 +66,13 @@ class BST_frame extends JFrame {
         });
     }
 
-    public static void main(String[] args){
-        JFrame frame = new BST_frame(); //전체 윈도우 프레임 객체 생성
-
-        frame.setResizable(false);
-        frame.setVisible(true);
-        frame.setSize(1200, 940);
-        frame.setTitle("Binary Search Tree - 2016010887 이수호");
-        frame.setBackground(Color.LIGHT_GRAY);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
     public boolean isFull() {
         if(nodecnt == MAX_NODE_COUNT) return true;
+        else return false;
+    }
+
+    public boolean isFullDepth(Node n) {
+        if(n.getDepth() == MAX_DEPTH) return true;
         else return false;
     }
 
@@ -162,11 +84,6 @@ class BST_frame extends JFrame {
             else searchNode = searchNode.getRight();
         }
         return false;
-    }
-
-    public boolean isFullDepth(Node n) {
-        if(n.getDepth() == MAX_DEPTH) return true;
-        else return false;
     }
 
     public void insert(int value) {
@@ -330,58 +247,142 @@ class BST_frame extends JFrame {
         }
         return getNode;
     }
-}
 
-class Node { // 노드의 자료구조
-    int value; // 키 값
-    Node right, left; // 자식 노드
-    int depth; // 노드의 레벨 (깊이)
-    int x_coor, y_coor; // 노드가 그려질 x좌표, y좌표
+    class BtnPanel extends JPanel { // 입출력 UI
+        final String BTNPANEL_BG_COLOR = "#9999FF";
 
-    public Node(int value) {
-        this.value = value;
-    }
+        JButton btnInsert, btnDelete;
+        JTextField number;
 
-    public int getValue() {
-        return value;
-    }
-    public void setValue(int value) {
-        this.value = value;
-    }
-    public Node getRight() {
-        return right;
-    }
-    public void setRight(Node right) {
-        this.right = right;
-    }
-    public Node getLeft() {
-        return left;
-    }
-    public void setLeft(Node left) {
-        this.left = left;
-    }
-    public int getX_coor() {
-        return x_coor;
-    }
-    public void setX_coor(int x_coor) {
-        this.x_coor = x_coor;
-    }
-    public int getY_coor() {
-        return y_coor;
-    }
-    public void setY_coor(int y_coor) {
-        this.y_coor = y_coor;
-    }
-    public int getDepth() {
-        return depth;
-    }
-    public void setDepth(int depth) {
-        this.depth = depth;
+        BtnPanel() {
+            number = new JTextField(5); // 숫자 입력 칸
+            btnInsert = new JButton("삽입"); // 삽입 버튼
+            btnDelete = new JButton("삭제"); // 삭제 버튼
+
+            btnInsert.setSize(60, 40);
+            btnDelete.setSize(60, 40); // 버튼 크기 조절
+
+            setOpaque(true);
+            setBackground(Color.decode(BTNPANEL_BG_COLOR));
+
+            add(number);
+            add(btnInsert);
+            add(btnDelete); // 패널에 요소 삽입
+        }
     }
 
-    public void setCoordinate(Node n) {
-        this.setX_coor(n.getX_coor());
-        this.setY_coor(n.getY_coor());
-        this.setDepth(n.getDepth());
+    class TreePanel extends JPanel { // 트리가 그려지는 패널
+        final String TREEPANEL_BG_COLOR = "#FFFFFF";
+        final String NODE_COLOR = "#FFCC66";
+        final String COLOR_BLACK = "#000000";
+
+        TreePanel() {
+            setOpaque(true);
+            setBackground(Color.decode(TREEPANEL_BG_COLOR));
+        }
+
+        public void drawTree(Node n, Node root) { // 트리 그리는 함수
+            Graphics dTree = getGraphics();
+
+            if(n == root) {
+                super.paintComponent(dTree);
+            }
+
+            if(n != null) {
+                drawTree(n.getLeft(), n);
+                if (n.getLeft() != null && n.getRight() != null) {
+                    drawLine(n, n.getLeft());
+                    drawLine(n, n.getRight());
+                } else if (n.getLeft() == null && n.getRight() != null) {
+                    drawLine(n, n.getRight());
+                } else if (n.getRight() == null && n.getLeft() != null) {
+                    drawLine(n, n.getLeft());
+                }
+                drawNode(n);
+                drawTree(n.getRight(), n);
+            }
+        }
+
+        public void drawNode(Node n) { // 노드 그리는 함수
+            Graphics dNode = getGraphics();
+
+            dNode.setColor(Color.decode(NODE_COLOR));
+            dNode.fillOval(n.getX_coor(), n.getY_coor(), 40, 40);
+            dNode.setColor(Color.decode(COLOR_BLACK));
+            dNode.drawString(Integer.toString(n.getValue()), n.getX_coor() + 13, n.getY_coor() + 23);
+        }
+
+        public void drawLine(Node p, Node n) { // 간선 그리는 함수
+            Graphics line = getGraphics();
+            line.setColor(Color.decode(COLOR_BLACK));
+            line.drawLine(p.getX_coor() + 20, p.getY_coor() + 40, n.getX_coor() + 20, n.getY_coor());
+        }
     }
+
+    class Node { // 노드의 자료구조
+        int value; // 키 값
+        Node right, left; // 자식 노드
+        int depth; // 노드의 레벨 (깊이)
+        int x_coor, y_coor; // 노드가 그려질 x좌표, y좌표
+
+        public Node(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+        public void setValue(int value) {
+            this.value = value;
+        }
+        public Node getRight() {
+            return right;
+        }
+        public void setRight(Node right) {
+            this.right = right;
+        }
+        public Node getLeft() {
+            return left;
+        }
+        public void setLeft(Node left) {
+            this.left = left;
+        }
+        public int getX_coor() {
+            return x_coor;
+        }
+        public void setX_coor(int x_coor) {
+            this.x_coor = x_coor;
+        }
+        public int getY_coor() {
+            return y_coor;
+        }
+        public void setY_coor(int y_coor) {
+            this.y_coor = y_coor;
+        }
+        public int getDepth() {
+            return depth;
+        }
+        public void setDepth(int depth) {
+            this.depth = depth;
+        }
+
+        public void setCoordinate(Node n) {
+            this.setX_coor(n.getX_coor());
+            this.setY_coor(n.getY_coor());
+            this.setDepth(n.getDepth());
+        }
+    }
+
+    public static void main(String[] args){
+        JFrame frame = new BST_frame(); //전체 윈도우 프레임 객체 생성
+
+        frame.setResizable(false);
+        frame.setVisible(true);
+        frame.setSize(1200, 940);
+        frame.setTitle("Binary Search Tree - 2016010887 이수호");
+        frame.setBackground(Color.LIGHT_GRAY);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
 }
