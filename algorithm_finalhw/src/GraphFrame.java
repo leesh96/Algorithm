@@ -343,7 +343,7 @@ public class GraphFrame extends JFrame {
             if (endX > startX) {
                 if (endY < startY) {
                     graphics.drawLine(startX + xlen, startY - ylen, endX - xlen, endY + ylen);
-                    drawWeight(weight, startX + (int)(0.4 * deltaX) - 5, startY - (int)(0.4 * deltaY));
+                    drawWeight(weight, startX + (int)(0.4 * deltaX) - 10, startY - (int)(0.4 * deltaY));
                 } else if (endY == startY) {
                     graphics.drawLine(startX + 15, startY, endX - 15, endY);
                     drawWeight(weight, startX + (int)(0.4 * deltaX), startY + 10);
@@ -368,7 +368,7 @@ public class GraphFrame extends JFrame {
                     drawWeight(weight, startX - (int)(0.4 * deltaX), startY - 5);
                 } else {
                     graphics.drawLine(startX - xlen, startY + ylen, endX + xlen, endY - ylen);
-                    drawWeight(weight, startX - (int)(0.4 * deltaX) + 5, startY + (int)(0.4 * deltaY));
+                    drawWeight(weight, startX - (int)(0.4 * deltaX) + 10, startY + (int)(0.4 * deltaY));
                 }
             }
         }
