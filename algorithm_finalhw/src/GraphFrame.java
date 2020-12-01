@@ -148,7 +148,6 @@ public class GraphFrame extends JFrame {
                         kruskalPanel.drawEdge(edge);
                     }
                     //kruskalPanel.repaint();
-                    inputStart.setText("");
                 }
             }
         });
