@@ -22,9 +22,9 @@ public class GraphFrame extends JFrame {
     public int vertexCount = 1;
     public int[] parent;
 
-    public JLabel comboLabel1, comboLabel2, textLabel3, textLabel4;
+    public JLabel comboLabel1, comboLabel2, textLabel3;
     public JComboBox startVertex, endVertex;
-    public JTextField inputWeight, inputStart;
+    public JTextField inputWeight;
     public JButton btnMakeEdge, btnMidResult, btnFinalResult;
 
     public ArrayList<Vertex> allVertex;
@@ -44,8 +44,6 @@ public class GraphFrame extends JFrame {
         endVertex = new JComboBox();
         inputWeight = new JTextField();
         btnMakeEdge = new JButton("INPUT EDGE");
-        textLabel4 = new JLabel("시작정점");
-        inputStart = new JTextField();
         btnMidResult = new JButton("중간 결과");
         btnFinalResult = new JButton("최종 결과");
 
@@ -66,9 +64,6 @@ public class GraphFrame extends JFrame {
         textLabel3.setPreferredSize(new Dimension(60, 20));
         textLabel3.setHorizontalAlignment(SwingConstants.CENTER);
         inputWeight.setPreferredSize(new Dimension(80, 20));
-        textLabel4.setPreferredSize(new Dimension(60, 20));
-        textLabel4.setHorizontalAlignment(SwingConstants.CENTER);
-        inputStart.setPreferredSize(new Dimension(80, 20));
         btnMakeEdge.setPreferredSize(new Dimension(120, 40));
         btnMidResult.setPreferredSize(new Dimension(120, 40));
         btnFinalResult.setPreferredSize(new Dimension(120, 40));
@@ -128,48 +123,30 @@ public class GraphFrame extends JFrame {
         btnMidResult.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (inputStart.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "시작 정점을 입력하세요!(for PRIM)", "결과 출력 불가", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    int startVertexNum = Integer.parseInt(inputStart.getText());
-                    PrimMST PrimResult = primAlgo(allVertex.get(startVertexNum - 1), allVertex.size() / 2);
-                    for (Vertex vertex : PrimResult.resVertex) {
-                        primPanel.drawVertex(vertex);
-                    }
-                    for (Edge edge : PrimResult.resEdge) {
-                        primPanel.drawEdge(edge);
-                    }
-                    //primPanel.repaint();
-                    KruskalMST KruskalResult = kruskalAlgo(allVertex.size() / 2);
-                    for (Vertex vertex : KruskalResult.resVertex) {
-                        kruskalPanel.drawVertex(vertex);
-                    }
-                    for (Edge edge : KruskalResult.resEdge) {
-                        kruskalPanel.drawEdge(edge);
-                    }
-                    //kruskalPanel.repaint();
-                }
+                double dLen = Math.ceil((double)allVertex.size() / (double)2);
+                int iLen = (int) dLen;
+                PrimMST primResult = primAlgo(allVertex.get(0), iLen);
+                KruskalMST kruskalResult = kruskalAlgo(iLen);
+
+                primPanel.drawPrim(primResult);
+                kruskalPanel.drawKruskal(kruskalResult);
+
+                //primPanel.repaint();
+                //kruskalPanel.repaint();
             }
         });
 
         btnFinalResult.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                PrimMST primResult = primAlgo(allVertex.get(0), allVertex.size());
+                KruskalMST kruskalResult = kruskalAlgo(allVertex.size());
 
-                if (inputStart.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "시작 정점을 입력하세요!(for PRIM)", "결과 출력 불가", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    int startVertexNum = Integer.parseInt(inputStart.getText());
-                    PrimMST primResult = primAlgo(allVertex.get(startVertexNum - 1), allVertex.size());
-                    KruskalMST kruskalResult = kruskalAlgo(allVertex.size());
+                primPanel.drawPrim(primResult);
+                kruskalPanel.drawKruskal(kruskalResult);
 
-                    primPanel.drawPrim(primResult);
-                    kruskalPanel.drawKruskal(kruskalResult);
-
-                    inputStart.setText("");
-                    //primPanel.repaint();
-                    //kruskalPanel.repaint();
-                }
+                //primPanel.repaint();
+                //kruskalPanel.repaint();
             }
         });
 
@@ -179,8 +156,6 @@ public class GraphFrame extends JFrame {
         buttonPanel.add(endVertex);
         buttonPanel.add(textLabel3);
         buttonPanel.add(inputWeight);
-        buttonPanel.add(textLabel4);
-        buttonPanel.add(inputStart);
         buttonPanel.add(btnMakeEdge);
         buttonPanel.add(btnMidResult);
         buttonPanel.add(btnFinalResult);
@@ -386,7 +361,7 @@ public class GraphFrame extends JFrame {
             }
 
             if(isCollision) {
-                JOptionPane.showMessageDialog(null, "겹치는 정점 존재!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "정점" + start.getVertexNum() + " 과(와) " + "정점" + end.getVertexNum() + " 사이에 겹치는 정점 존재!", "엣지 생성 불가", JOptionPane.ERROR_MESSAGE);
             } else {
                 drawEdge(start, end, weight);
             }
@@ -719,4 +694,4 @@ public class GraphFrame extends JFrame {
     }
 
 }
-// TODO: 2020-12-01 여러 입력 해보기
+// TODO: 2020-12-01 중간 결과 출력 수정, 여러 입력 해보기
