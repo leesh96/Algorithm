@@ -50,10 +50,10 @@ public class GraphFrame extends JFrame {
         allVertex = new ArrayList<>();
         allEdge = new ArrayList<>();
 
-        inputPanel.setBounds(20, 50, 500, 500);
-        buttonPanel.setBounds(540, 50, 200, 500);
-        primPanel.setBounds(760, 50, 500, 500);
-        kruskalPanel.setBounds(1280, 50, 500, 500);
+        inputPanel.setBounds(20, 5, 500, 500);
+        buttonPanel.setBounds(540, 5, 200, 500);
+        primPanel.setBounds(20, 510, 500, 500);
+        kruskalPanel.setBounds(540, 510, 500, 500);
 
         comboLabel1.setPreferredSize(new Dimension(60, 20));
         comboLabel1.setHorizontalAlignment(SwingConstants.CENTER);
@@ -497,18 +497,30 @@ public class GraphFrame extends JFrame {
         }
 
         public void drawPrim(PrimMST primMST) {
-            for (Vertex vertex : primMST.resVertex) {
-                primPanel.drawVertex(vertex);
+            Graphics g = getGraphics();
+            g.setColor(Color.decode(PRIMPANEL_COLOR));
+            g.fillRect(5,15, 480, 480);
+            for (Vertex vertex : allVertex) {
+                drawVertex(vertex);
             }
+            /*for (Vertex vertex : primMST.resVertex) {
+                primPanel.drawVertex(vertex);
+            }*/
             for (Edge edge : primMST.resEdge) {
                 primPanel.drawEdge(edge);
             }
         }
 
         public void drawKruskal(KruskalMST kruskalMST) {
-            for (Vertex vertex : kruskalMST.resVertex) {
-                kruskalPanel.drawVertex(vertex);
+            Graphics g = getGraphics();
+            g.setColor(Color.decode(KRUSKAL_COLOR));
+            g.fillRect(5,15, 480, 480);
+            for (Vertex vertex : allVertex) {
+                drawVertex(vertex);
             }
+            /*for (Vertex vertex : kruskalMST.resVertex) {
+                kruskalPanel.drawVertex(vertex);
+            }*/
             for (Edge edge : kruskalMST.resEdge) {
                 kruskalPanel.drawEdge(edge);
             }
@@ -654,7 +666,7 @@ public class GraphFrame extends JFrame {
         }
     }
 
-    /*class LinkedEdge implements Comparable<LinkedEdge> {    // 인접 정점을 잇는 간선 자료구조 -> 우선순위 큐
+/*    class LinkedEdge implements Comparable<LinkedEdge> {    // 인접 정점을 잇는 간선 자료구조 -> 우선순위 큐
         public Vertex linkVertex;
         public int weight;
 
@@ -687,11 +699,10 @@ public class GraphFrame extends JFrame {
 
     public static void main(String[] args) {
         JFrame frame = new GraphFrame("2016010887이수호");
-        frame.setSize(1810, 630);
+        frame.setSize(1070, 1050);
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
 }
-// TODO: 2020-12-01 중간 결과 출력 수정, 여러 입력 해보기
