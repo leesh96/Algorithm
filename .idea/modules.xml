@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/Algorithm.iml" filepath="$PROJECT_DIR$/.idea/Algorithm.iml" />
       <module fileurl="file://$PROJECT_DIR$/algorithm_finalhw/algorithm_finalhw.iml" filepath="$PROJECT_DIR$/algorithm_finalhw/algorithm_finalhw.iml" />
       <module fileurl="file://$PROJECT_DIR$/algorithm_midhw/algorithm_midhw.iml" filepath="$PROJECT_DIR$/algorithm_midhw/algorithm_midhw.iml" />
+      <module fileurl="file://$PROJECT_DIR$/baekjoon/baekjoon.iml" filepath="$PROJECT_DIR$/baekjoon/baekjoon.iml" />
     </modules>
   </component>
 </project>
