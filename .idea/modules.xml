@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Algorithm.iml" filepath="$PROJECT_DIR$/.idea/Algorithm.iml" />
-      <module fileurl="file://$PROJECT_DIR$/algorithm_finalhw/algorithm_finalhw.iml" filepath="$PROJECT_DIR$/algorithm_finalhw/algorithm_finalhw.iml" />
-      <module fileurl="file://$PROJECT_DIR$/algorithm_midhw/algorithm_midhw.iml" filepath="$PROJECT_DIR$/algorithm_midhw/algorithm_midhw.iml" />
-      <module fileurl="file://$PROJECT_DIR$/baekjoon/baekjoon.iml" filepath="$PROJECT_DIR$/baekjoon/baekjoon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Baekjoon/Baekjoon.iml" filepath="$PROJECT_DIR$/Baekjoon/Baekjoon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FinalHW/FinalHW.iml" filepath="$PROJECT_DIR$/FinalHW/FinalHW.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/JavaAlgorithm.iml" filepath="$PROJECT_DIR$/.idea/JavaAlgorithm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MidHW/MidHW.iml" filepath="$PROJECT_DIR$/MidHW/MidHW.iml" />
     </modules>
   </component>
 </project>
