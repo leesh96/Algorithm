@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Baekjoon/Baekjoon.iml" filepath="$PROJECT_DIR$/Baekjoon/Baekjoon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Algorithm2020.iml" filepath="$PROJECT_DIR$/.idea/Algorithm2020.iml" />
       <module fileurl="file://$PROJECT_DIR$/FinalHW/FinalHW.iml" filepath="$PROJECT_DIR$/FinalHW/FinalHW.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/JavaAlgorithm.iml" filepath="$PROJECT_DIR$/.idea/JavaAlgorithm.iml" />
       <module fileurl="file://$PROJECT_DIR$/MidHW/MidHW.iml" filepath="$PROJECT_DIR$/MidHW/MidHW.iml" />
     </modules>
   </component>
